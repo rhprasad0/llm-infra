@@ -1,0 +1,72 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  dependsOn:
+    - name: nvidia-device-plugin
+      namespace: nvidia-device-plugin
+  releaseName: ollama
+  targetNamespace: ollama
+  interval: 1h # Helm CRD drift detection interval
+  chart:
+    spec:
+      chart: ollama
+      version: 1.27.0
+      interval: 10h # Interval for Helm chart updates
+      sourceRef:
+        kind: HelmRepository
+        name: ollama
+        namespace: ollama
+  values:
+    # Ollama configuration
+    ollama:
+      # Enable GPU support if available
+      gpu:
+        enabled: true
+        type: "nvidia"
+        number: 1
+      # Pull the gemma3:12b model on startup
+      models:
+        pull:
+          - gemma3:12b
+          - dolphin3:8b
+
+    # Resource requests and limits for 12B parameter models
+    resources:
+      requests:
+        cpu: 1
+        memory: 8Gi
+        nvidia.com/gpu: 1  # Require GPU - pod will fail to schedule if unavailable
+      limits:
+        cpu: 12
+        memory: 24Gi
+        nvidia.com/gpu: 1
+    
+    # Service configuration
+    service:
+      type: ClusterIP
+      port: 11434
+    
+    # Persistence for models - use existing PVC
+    persistentVolume:
+      enabled: true
+      existingClaim: ollama-pvc
+    
+    # Node selector and affinity to run on the GPU node with local storage
+    nodeSelector:
+      nvidia.com/gpu.present: "true"
+    
+    # Required node affinity - pod will fail if no GPU nodes available
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: nvidia.com/gpu.present
+              operator: In
+              values:
+              - "true"
+    
+
