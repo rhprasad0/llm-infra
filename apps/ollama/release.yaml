@@ -6,7 +6,7 @@ metadata:
 spec:
   dependsOn:
     - name: nvidia-device-plugin
-      namespace: nvidia-device-plugin
+      namespace: kube-system
   releaseName: ollama
   targetNamespace: ollama
   interval: 1h # Helm CRD drift detection interval
