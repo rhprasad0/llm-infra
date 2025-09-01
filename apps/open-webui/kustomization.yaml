@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - repository.yaml
+  - open-webui-pv.yaml
+  - open-webui-pvc.yaml
+  - release.yaml
+  - ingress.yaml
+
+patches:
+  - target:
+      kind: PersistentVolumeClaim
+      name: open-webui-pvc
+    patch: |-
+      - op: add
+        path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1depends-on
+        value: open-webui/open-webui-local-pv
+  - target:
+      kind: HelmRelease
+      name: open-webui
+    patch: |-
+      - op: add
+        path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1depends-on
+        value: open-webui/open-webui-pvc
+  - target:
+      kind: Ingress
+      name: open-webui
+    patch: |-
+      - op: add
+        path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1depends-on
+        value: open-webui/open-webui
