@@ -14,3 +14,11 @@ spec:
   volumeMode: Filesystem
   local:
     path: /data/ollama
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ryan-gpu
