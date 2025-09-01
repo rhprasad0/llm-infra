@@ -17,17 +17,3 @@ patches:
       - op: add
         path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1depends-on
         value: open-webui/open-webui-local-pv
-  - target:
-      kind: HelmRelease
-      name: open-webui
-    patch: |-
-      - op: add
-        path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1depends-on
-        value: open-webui/open-webui-pvc
-  - target:
-      kind: Ingress
-      name: open-webui
-    patch: |-
-      - op: add
-        path: /metadata/annotations/kustomize.toolkit.fluxcd.io~1depends-on
-        value: open-webui/open-webui

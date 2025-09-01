@@ -19,9 +19,3 @@ patches:
   - target:
       kind: HelmRelease
       name: ollama
-    patch: |-
-      - op: add
-        path: /spec/dependsOn/-
-        value:
-          name: ollama-pvc
-          namespace: ollama
