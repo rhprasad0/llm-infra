@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: ryan-gpu
+  labels:
+    accelerator: nvidia
+    nvidia.com/gpu.present: "true"
+    gpu-type: nvidia
