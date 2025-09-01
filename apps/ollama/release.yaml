@@ -10,6 +10,7 @@ spec:
   releaseName: ollama
   targetNamespace: ollama
   interval: 1h # Helm CRD drift detection interval
+  timeout: 10m # Overall timeout for install/upgrade operations
   chart:
     spec:
       chart: ollama
