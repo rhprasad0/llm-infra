@@ -1,0 +1,99 @@
+# Accessible at: http://open-webui-pipelines.open-webui-pipelines.svc.cluster.local:9099
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui-pipelines
+  namespace: open-webui-pipelines
+spec:
+  dependsOn:
+    - name: ollama
+      namespace: ollama
+    - name: open-webui
+      namespace: open-webui
+  releaseName: open-webui-pipelines
+  targetNamespace: open-webui-pipelines
+  interval: 1h # Helm CRD drift detection interval
+  chart:
+    spec:
+      chart: pipelines
+      interval: 10h # Interval for Helm chart updates
+      sourceRef:
+        kind: HelmRepository
+        name: open-webui-pipelines
+        namespace: open-webui-pipelines
+  values:
+    # Image configuration
+    image:
+      repository: ghcr.io/open-webui/pipelines
+      tag: latest
+      pullPolicy: Always
+
+    # Service configuration
+    service:
+      type: ClusterIP
+      port: 9099
+      annotations: {}
+
+    # Resource configuration
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        cpu: 1
+        memory: 2Gi
+
+    # Persistence configuration
+    persistence:
+      enabled: true
+      storageClass: ""
+      accessMode: ReadWriteOnce
+      size: 2Gi
+      mountPath: /app/pipelines
+
+    # Environment variables
+    env:
+      - name: PIPELINES_DIR
+        value: "/app/pipelines"
+      - name: PIPELINES_REQUIREMENTS_PATH
+        value: "/app/pipelines/requirements.txt"
+
+    # Node selector for GPU nodes if needed
+    nodeSelector: {}
+    
+    # Tolerations for GPU nodes if needed
+    tolerations: []
+    
+    # Affinity rules
+    affinity: {}
+
+    # Security context
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    # Pod security context
+    podSecurityContext:
+      fsGroup: 1000
+
+    # Health checks
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 9099
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 9099
+      initialDelaySeconds: 15
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3

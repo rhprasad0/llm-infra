@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - ./ollama
   - ./open-webui
+  - ./open-webui-pipelines
