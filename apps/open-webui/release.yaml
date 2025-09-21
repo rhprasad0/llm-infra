@@ -41,8 +41,8 @@ spec:
         cpu: 500m
         memory: 512Mi
       limits:
-        cpu: 4
-        memory: 8Gi
+        cpu: 2
+        memory: 4Gi
     
     # Service configuration - using LoadBalancer to match your Ollama setup
     service:
